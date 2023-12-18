@@ -1,0 +1,49 @@
+version: '3'
+
+networks:
+  zendnet:
+    driver: bridge
+
+services:
+  zend:
+    image: sandromatos/zend:latest
+    build: 
+      context: ./zend
+      dockerfile: Dockerfile
+    tty:
+      true
+    container_name: zend
+    volumes:
+      - ./zend:/var/www
+    networks:
+      - zendnet
+    ports:
+      - "8000:8000"
+      - "8001:8001"
+    
+
+  db:
+    image: mysql:5.7
+    command: --innodb-use-native-aio=0
+    container_name: db
+    restart: always
+    tty: true
+    environment:
+      - MYSQL_DATABASE="nodedb"
+      - MYSQL_ROOT_PASSWORD="root"
+      - MYSQL_USER="root"
+    volumes:
+      - ./mysql:/var/lib/mysql
+    
+    networks:
+      - zendnet
+    ports:
+      - "3306:3306"
+
+
+      # docker run  -it -v ./zend:/var/www/html -p 8000:8000 docker-zend
+      # docker exec docker-zend bash
+
+      # docker run -it -p 8000:8000 -v  ./zend:/var/www --network docker_zendnet  docker-zend bash 
+
+      # sudo code zend/ --no-sandbox --user-data-dir
